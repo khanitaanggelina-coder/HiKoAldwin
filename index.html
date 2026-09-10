@@ -1,63 +1,196 @@
+Ini code HTML-nya. Simpan sebagai `index.html`:
+
+```html
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>For Ko Aldwin</title>
-    <style>
-        body {
-            background-color: pink;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            font-family: 'Verdana', sans-serif;
-        }
-        canvas {
-            background-color: pink;
-        }
-        h2 {
-            color: lightblue;
-            margin-top: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>For Ko Aldwin</title>
+
+  <style>
+    :root {
+      --pink: #ffc0cb;
+      --red: #ef233c;
+      --blue: #add8e6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background:
+        radial-gradient(
+          circle at 50% 40%,
+          rgba(255, 255, 255, 0.3),
+          transparent 28rem
+        ),
+        var(--pink);
+      font-family: Verdana, Geneva, sans-serif;
+    }
+
+    .heart-wrapper {
+      position: relative;
+      width: min(82vw, 390px);
+      animation: float 3.5s ease-in-out infinite;
+      filter: drop-shadow(0 18px 18px rgba(141, 24, 48, 0.15));
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+
+    .heart {
+      fill: var(--red);
+      stroke: var(--red);
+      stroke-width: 3;
+      stroke-linejoin: round;
+      stroke-dasharray: 1100;
+      stroke-dashoffset: 1100;
+      animation:
+        draw 1.8s ease-out forwards,
+        glow 2.4s ease-in-out 1.8s infinite alternate;
+    }
+
+    .heart-text {
+      fill: var(--blue);
+      font-family: Verdana, Geneva, sans-serif;
+      font-size: 20px;
+      font-weight: bold;
+      text-anchor: middle;
+      dominant-baseline: middle;
+      opacity: 0;
+      animation: appear 0.8s ease-out 0.25s forwards;
+    }
+
+    .sparkle {
+      position: absolute;
+      color: white;
+      font-size: 22px;
+      animation: twinkle 2.2s ease-in-out infinite;
+    }
+
+    .sparkle.one {
+      top: 18%;
+      left: 6%;
+    }
+
+    .sparkle.two {
+      right: 4%;
+      bottom: 28%;
+      font-size: 16px;
+      animation-delay: 0.8s;
+    }
+
+    @keyframes draw {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes appear {
+      from {
+        transform: translateY(12px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    @keyframes glow {
+      from {
+        filter: brightness(1);
+      }
+
+      to {
+        filter: brightness(1.08);
+      }
+    }
+
+    @keyframes twinkle {
+      0%, 100% {
+        transform: scale(0.7) rotate(0deg);
+        opacity: 0.3;
+      }
+
+      50% {
+        transform: scale(1.15) rotate(12deg);
+        opacity: 1;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+  </style>
 </head>
+
 <body>
+  <div class="heart-wrapper">
+    <span class="sparkle one">✦</span>
+    <span class="sparkle two">✦</span>
 
-    <!-- Kanvas tempat gambar hati muncul -->
-    <canvas id="heartCanvas" width="400" height="400"></canvas>
-    <h2>Hey njink</h2>
+    <svg
+      viewBox="0 0 300 280"
+      role="img"
+      aria-label="Hati berwarna merah"
+    >
+      <path
+        class="heart"
+        d="M150 258
+           C138 244 32 179 22 105
+           C14 45 89 18 128 61
+           L150 85
+           L172 61
+           C211 18 286 45 278 105
+           C268 179 162 244 150 258 Z"
+      />
 
-    <script>
-        const canvas = document.getElementById('heartCanvas');
-        const ctx = canvas.getContext('2d');
-
-        // Mengatur posisi awal di tengah kanvas
-        ctx.translate(canvas.width / 2, canvas.height / 2 + 30);
-        ctx.scale(1.5, 1.5);
-
-        ctx.beginPath();
-        ctx.fillStyle = "red";
-        
-        // Menggambar bentuk hati menggunakan rumus matematika
-        for (let t = 0; t <= Math.PI * 2; t += 0.01) {
-            let x = 16 * Math.pow(Math.sin(t), 3);
-            let y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
-            
-            if (t === 0) {
-                ctx.moveTo(x, y);
-            } else {
-                ctx.lineTo(x, y);
-            }
-        }
-        
-        ctx.closePath();
-        ctx.fill();
-    </script>
-
+      <!-- Teks berada di tengah hati -->
+      <text
+        class="heart-text"
+        x="150"
+        y="150"
+      >
+        Hey njink
+      </text>
+    </svg>
+  </div>
 </body>
 </html>
+```
+
+Bagian yang membuat teks berada di tengah hati adalah:
+
+```html
+<text class="heart-text" x="150" y="150">
+  Hey njink
+</text>
+```
