@@ -1,11 +1,8 @@
-Ini code HTML-nya. Simpan sebagai `index.html`:
-
-```html
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>For Ko Aldwin</title>
 
   <style>
@@ -13,6 +10,7 @@ Ini code HTML-nya. Simpan sebagai `index.html`:
       --pink: #ffc0cb;
       --red: #ef233c;
       --blue: #add8e6;
+      --dark-pink: #c73558;
     }
 
     * {
@@ -35,18 +33,305 @@ Ini code HTML-nya. Simpan sebagai `index.html`:
       font-family: Verdana, Geneva, sans-serif;
     }
 
-    .heart-wrapper {
+    .stage {
+      position: relative;
+      width: min(92vw, 560px);
+      min-height: 390px;
+    }
+
+    .envelope-screen,
+    .surprise {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      transition:
+        opacity 0.7s ease,
+        transform 0.7s ease;
+    }
+
+    .envelope-screen {
+      z-index: 2;
+    }
+
+    .surprise {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.75) translateY(20px);
+    }
+
+    .stage.opened .envelope-screen {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.85) translateY(-25px);
+    }
+
+    .stage.opened .surprise {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1) translateY(0);
+    }
+
+    /* Love explosion */
+    .love-burst {
+      position: absolute;
+      z-index: 8;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .stage.opened .love-burst {
+      opacity: 1;
+    }
+
+    .burst-heart {
+      position: absolute;
+      top: 48%;
+      left: 50%;
+      color: var(--red);
+      font-size: clamp(1.1rem, 4vw, 1.8rem);
+      line-height: 1;
+      opacity: 0;
+      text-shadow: 0 3px 8px rgba(141, 24, 48, 0.2);
+      transform: translate(-50%, -50%) scale(0.2);
+    }
+
+    .stage.opened .burst-heart {
+      animation:
+        burst-heart 1.7s cubic-bezier(0.2, 0.8, 0.2, 1)
+        var(--delay) forwards;
+    }
+
+    .burst-heart:nth-child(3n) {
+      color: #ff5b78;
+    }
+
+    .burst-heart:nth-child(4n) {
+      color: #d92555;
+      font-size: clamp(0.9rem, 3vw, 1.4rem);
+    }
+
+    @keyframes burst-heart {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
+      }
+
+      15% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2) rotate(-8deg);
+      }
+
+      100% {
+        opacity: 0;
+        transform:
+          translate(
+            calc(-50% + var(--x)),
+            calc(-50% + var(--y))
+          )
+          scale(0.8)
+          rotate(var(--rotation));
+      }
+    }
+
+    /* Envelope */
+    .envelope-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: #9b2944;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .envelope-button:focus-visible {
+      outline: 4px solid rgba(173, 216, 230, 0.9);
+      outline-offset: 10px;
+      border-radius: 12px;
+    }
+
+    .envelope {
+      position: relative;
+      display: block;
+      width: min(72vw, 330px);
+      aspect-ratio: 1.5;
+      overflow: hidden;
+      border-radius: 8px;
+      background: linear-gradient(145deg, #ff9eb2, #e97991);
+      box-shadow: 0 18px 28px rgba(141, 24, 48, 0.2);
+    }
+
+    .envelope::before,
+    .envelope::after {
+      content: "";
+      position: absolute;
+      z-index: 2;
+      bottom: 0;
+      width: 72%;
+      height: 4px;
+      background: #dc617b;
+    }
+
+    .envelope::before {
+      left: -7%;
+      transform: rotate(31deg);
+      transform-origin: left center;
+    }
+
+    .envelope::after {
+      right: -7%;
+      transform: rotate(-31deg);
+      transform-origin: right center;
+    }
+
+    .flap {
+      position: absolute;
+      z-index: 2;
+      top: -1px;
+      left: 0;
+      width: 100%;
+      height: 58%;
+      background: #f7a1b1;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      transform-origin: top center;
+      transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .stage.opened .flap {
+      transform: rotateX(180deg);
+    }
+
+    .letter {
+      position: absolute;
+      z-index: 1;
+      left: 10%;
+      bottom: 4%;
+      width: 80%;
+      height: 78%;
+      border-radius: 5px;
+      background: #fff9f2;
+      box-shadow: 0 3px 10px rgba(141, 24, 48, 0.12);
+      transition: transform 0.8s 0.15s ease;
+    }
+
+    .letter::after {
+      content: "♥";
+      position: absolute;
+      top: 17%;
+      left: 50%;
+      color: var(--red);
+      font-size: 1.4rem;
+      transform: translateX(-50%);
+    }
+
+    .stage.opened .letter {
+      transform: translateY(-42%);
+    }
+
+    /* Ribbon */
+    .ribbon {
+      position: absolute;
+      z-index: 5;
+      display: block;
+      background:
+        linear-gradient(
+          90deg,
+          var(--dark-pink),
+          #ed6983,
+          var(--dark-pink)
+        );
+      box-shadow: 0 2px 5px rgba(141, 24, 48, 0.16);
+      pointer-events: none;
+    }
+
+    .ribbon-vertical {
+      top: 0;
+      bottom: 0;
+      left: 44%;
+      width: 12%;
+    }
+
+    .ribbon-horizontal {
+      top: 46%;
+      left: 0;
+      width: 100%;
+      height: 12%;
+      background:
+        linear-gradient(
+          180deg,
+          var(--dark-pink),
+          #ed6983,
+          var(--dark-pink)
+        );
+    }
+
+    /* Heart seal */
+    .seal {
+      position: absolute;
+      z-index: 6;
+      top: 40%;
+      left: 50%;
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      border: 3px solid #f7b2bd;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 30%, #f06c87, #bd2c50 72%);
+      color: #ffdce3;
+      font-size: 1.35rem;
+      box-shadow:
+        0 4px 8px rgba(141, 24, 48, 0.22),
+        inset 0 2px 3px rgba(255, 255, 255, 0.25);
+      transform: translateX(-50%) rotate(-8deg);
+      pointer-events: none;
+    }
+
+    .envelope-copy {
+      position: absolute;
+      z-index: 7;
+      bottom: 11%;
+      left: 50%;
+      min-width: 120px;
+      width: max-content;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(255, 249, 242, 0.96);
+      color: #db4261;
+      font-family: Georgia, serif;
+      font-size: clamp(1.1rem, 4vw, 1.5rem);
+      font-weight: bold;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(141, 24, 48, 0.12);
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+
+    .hint {
+      font-size: 1rem;
+      font-weight: bold;
+      letter-spacing: 0.03em;
+    }
+
+    /* Big heart */
+    .heart-wrap {
       position: relative;
       width: min(82vw, 390px);
-      animation: float 3.5s ease-in-out infinite;
+      margin: 0 auto;
       filter: drop-shadow(0 18px 18px rgba(141, 24, 48, 0.15));
+      animation: float 3.5s ease-in-out infinite;
     }
 
     svg {
       display: block;
       width: 100%;
       height: auto;
-      overflow: visible;
     }
 
     .heart {
@@ -61,7 +346,7 @@ Ini code HTML-nya. Simpan sebagai `index.html`:
         glow 2.4s ease-in-out 1.8s infinite alternate;
     }
 
-    .heart-text {
+    .heart-message {
       fill: var(--blue);
       font-family: Verdana, Geneva, sans-serif;
       font-size: 20px;
@@ -75,7 +360,7 @@ Ini code HTML-nya. Simpan sebagai `index.html`:
     .sparkle {
       position: absolute;
       color: white;
-      font-size: 22px;
+      font-size: 1.4rem;
       animation: twinkle 2.2s ease-in-out infinite;
     }
 
@@ -87,7 +372,7 @@ Ini code HTML-nya. Simpan sebagai `index.html`:
     .sparkle.two {
       right: 4%;
       bottom: 28%;
-      font-size: 16px;
+      font-size: 1rem;
       animation-delay: 0.8s;
     }
 
@@ -153,44 +438,128 @@ Ini code HTML-nya. Simpan sebagai `index.html`:
 </head>
 
 <body>
-  <div class="heart-wrapper">
-    <span class="sparkle one">✦</span>
-    <span class="sparkle two">✦</span>
-
-    <svg
-      viewBox="0 0 300 280"
-      role="img"
-      aria-label="Hati berwarna merah"
-    >
-      <path
-        class="heart"
-        d="M150 258
-           C138 244 32 179 22 105
-           C14 45 89 18 128 61
-           L150 85
-           L172 61
-           C211 18 286 45 278 105
-           C268 179 162 244 150 258 Z"
-      />
-
-      <!-- Teks berada di tengah hati -->
-      <text
-        class="heart-text"
-        x="150"
-        y="150"
+  <main
+    class="stage"
+    id="stage"
+    aria-label="A surprise message for Ko Aldwin"
+  >
+    <section class="envelope-screen" aria-label="Surprise envelope">
+      <button
+        class="envelope-button"
+        id="open-envelope"
+        type="button"
       >
-        Hey njink
-      </text>
-    </svg>
-  </div>
+        <span class="envelope" aria-hidden="true">
+          <span class="flap"></span>
+          <span class="letter"></span>
+
+          <span class="ribbon ribbon-vertical"></span>
+          <span class="ribbon ribbon-horizontal"></span>
+
+          <span class="seal">♥</span>
+          <span class="envelope-copy">For you</span>
+        </span>
+
+        <span class="hint">Click the envelope to open</span>
+      </button>
+    </section>
+
+    <div class="love-burst" aria-hidden="true"></div>
+
+    <section class="surprise" aria-label="Heart surprise">
+      <div class="heart-wrap">
+        <span class="sparkle one">✦</span>
+        <span class="sparkle two">✦</span>
+
+        <svg
+          viewBox="0 0 300 280"
+          role="img"
+          aria-label="Red heart with a message"
+        >
+          <path
+            class="heart"
+            d="M150 258
+               C138 244 32 179 22 105
+               C14 45 89 18 128 61
+               L150 85
+               L172 61
+               C211 18 286 45 278 105
+               C268 179 162 244 150 258 Z"
+          />
+
+          <text
+            class="heart-message"
+            x="150"
+            y="150"
+          >
+            Hey njink
+          </text>
+        </svg>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const stage = document.getElementById("stage");
+    const openEnvelope = document.getElementById("open-envelope");
+    const loveBurst = document.querySelector(".love-burst");
+
+    const burstDirections = [
+      [-18, -154],
+      [28, -145],
+      [-72, -130],
+      [76, -120],
+      [-122, -88],
+      [118, -82],
+      [-158, -28],
+      [154, -22],
+      [-174, 35],
+      [170, 48],
+      [-132, 96],
+      [132, 105],
+      [-82, 142],
+      [78, 145],
+      [-30, 170],
+      [32, 174],
+      [-205, -102],
+      [198, -96],
+      [-218, 76],
+      [211, 83],
+      [-55, -198],
+      [61, -190],
+      [-100, 188],
+      [103, 185]
+    ];
+
+    burstDirections.forEach(([x, y], index) => {
+      const heart = document.createElement("span");
+
+      heart.className = "burst-heart";
+      heart.textContent = index % 5 === 0 ? "💖" : "♥";
+
+      heart.style.setProperty("--x", `${x}px`);
+      heart.style.setProperty("--y", `${y}px`);
+
+      heart.style.setProperty(
+        "--rotation",
+        `${(index % 2 ? 1 : -1) * (12 + index * 3)}deg`
+      );
+
+      heart.style.setProperty(
+        "--delay",
+        `${(index % 6) * 0.035}s`
+      );
+
+      loveBurst.appendChild(heart);
+    });
+
+    openEnvelope.addEventListener("click", () => {
+      stage.classList.add("opened");
+      openEnvelope.setAttribute(
+        "aria-label",
+        "Envelope already opened"
+      );
+    });
+  </script>
 </body>
 </html>
-```
-
-Bagian yang membuat teks berada di tengah hati adalah:
-
-```html
-<text class="heart-text" x="150" y="150">
-  Hey njink
-</text>
-```
